@@ -9,7 +9,7 @@ import {
 import { LLMChain } from 'langchain/chains';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { SplitterType, diff, join, merge, split } from './splitter';
-import { FormatterType, formatInput, formatOutput } from './formatter';
+import { FormatterType, unmarshal, marshal } from './formatter';
 
 yargs(hideBin(process.argv))
     .command('tc [file]', 'Translate formated file', (yargs) => {
@@ -86,8 +86,8 @@ export async function translate<T extends SplitterType, F extends FormatterType>
 
     const srcText = readFileSync(srcFile, 'utf-8');
     const dstText = existsSync(dstFile) ? readFileSync(dstFile, 'utf-8') : '';
-    const src = formatInput(format, srcText);
-    const dst = formatInput(format, dstText);
+    const src = unmarshal(format, srcText);
+    const dst = unmarshal(format, dstText);
     const [keep, patch] = diff(type, src, dst);
     const chunks = split(type, patch);
     const translated = [];
@@ -107,5 +107,5 @@ export async function translate<T extends SplitterType, F extends FormatterType>
     const translatedPatch = join(type, translated);
     const translatedData = merge(type, keep, translatedPatch);
 
-    writeFileSync(dstFile, formatOutput(format, translatedData));
+    writeFileSync(dstFile, marshal(format, translatedData));
 }

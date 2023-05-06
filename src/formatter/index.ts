@@ -6,8 +6,8 @@ export type FormatterType = {
 };
 
 export interface Formatter {
-    input: (text: string) => any;
-    output: (data: any) => string;
+    unmarshal: (text: string) => any;
+    marshal: (data: any) => string;
 }
 
 function getFormatter<T extends FormatterType>(type: T['type']): T['formatter'] {
@@ -19,16 +19,16 @@ function getFormatter<T extends FormatterType>(type: T['type']): T['formatter'] 
     }
 }
 
-export function formatInput<T extends FormatterType>(
+export function unmarshal<T extends FormatterType>(
     type: T['type'],
-    text: Parameters<T['formatter']['input']>[0]
+    text: Parameters<T['formatter']['unmarshal']>[0]
 ) {
-    return getFormatter(type).input(text);
+    return getFormatter(type).unmarshal(text);
 }
 
-export function formatOutput<T extends FormatterType>(
+export function marshal<T extends FormatterType>(
     type: T['type'],
-    data: Parameters<T['formatter']['output']>[0]
+    data: Parameters<T['formatter']['marshal']>[0]
 ) {
-    return getFormatter(type).output(data);
+    return getFormatter(type).marshal(data);
 }
