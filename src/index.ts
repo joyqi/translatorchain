@@ -9,6 +9,7 @@ import {
 import { LLMChain } from 'langchain/chains';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { SplitterType, diff, join, merge, split } from './splitter';
+import { FormatterType, formatInput, formatOutput } from './formatter';
 
 yargs(hideBin(process.argv))
     .command('tc [file]', 'Translate formated file', (yargs) => {
@@ -52,8 +53,9 @@ async function detectLanguage(chat: ChatOpenAI, langText: string): Promise<strin
     return text;
 }
 
-export async function translate<T extends SplitterType>(
+export async function translate<T extends SplitterType, F extends FormatterType>(
     type: T['type'],
+    format: F['type'],
     openAIApiKey: string,
     srcFile: string,
     dstFile: string,
@@ -82,26 +84,28 @@ export async function translate<T extends SplitterType>(
 
     console.log(`Translating ${srcFile} by ${srcLang} to ${dstFile} by ${dstLang}`);
 
-    const src = readFileSync(srcFile, 'utf-8');
-    const dst = existsSync(dstFile) ? readFileSync(dstFile, 'utf-8') : '';
+    const srcText = readFileSync(srcFile, 'utf-8');
+    const dstText = existsSync(dstFile) ? readFileSync(dstFile, 'utf-8') : '';
+    const src = formatInput(format, srcText);
+    const dst = formatInput(format, dstText);
     const [keep, patch] = diff(type, src, dst);
-    const patches = split(type, patch);
+    const chunks = split(type, patch);
     const translated = [];
-    console.log(`Translating ${patches.length} patches...`);
+    console.log(`Translating ${chunks.length} chunks...`);
 
-    for (const patch of patches) {
+    for (const chunk of chunks) {
         const { text } = await chain.call({
             input_language: srcLang,
             output_language: dstLang,
-            text: patch
+            text: JSON.stringify(chunk)
         });
 
-        translated.push(text);
-        console.log(`Translated ${translated.length} patches...`);
+        translated.push(JSON.parse(text));
+        console.log(`Translated ${translated.length} chunks...`);
     }
 
     const translatedPatch = join(type, translated);
-    const translatedText = merge(type, keep, translatedPatch);
+    const translatedData = merge(type, keep, translatedPatch);
 
-    writeFileSync(dstFile, translatedText);
+    writeFileSync(dstFile, formatOutput(format, translatedData));
 }

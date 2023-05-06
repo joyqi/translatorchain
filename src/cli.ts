@@ -25,6 +25,14 @@ const argv = yargs(hideBin(process.argv))
         demandOption: true,
         default: 'kv'
     })
+    .option('format', {
+        alias: 'f',
+        type: 'string',
+        description: 'The type of the file formatter',
+        choices: ['json'],
+        demandOption: true,
+        default: 'json'
+    })
     .options('src', {
         alias: 's',
         type: 'string',
@@ -52,6 +60,14 @@ const argv = yargs(hideBin(process.argv))
     .argv;
 
 (async () => {
-    const { key, output, type, src, dst, _ } = await argv;
-    translate(type as any, key as string, _[0] as string, output as string, src as string, dst as string);
+    const { key, format, output, type, src, dst, _ } = await argv;
+    translate(
+        type as any,
+        format as any,
+        key as string,
+        _[0] as string,
+        output as string,
+        src as string,
+        dst as string
+    );
 })();

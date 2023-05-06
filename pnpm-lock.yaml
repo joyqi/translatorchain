@@ -4,9 +4,9 @@ dependencies:
   '@dqbd/tiktoken':
     specifier: ^1.0.7
     version: 1.0.7
-  json-diff-ts:
-    specifier: ^1.2.5
-    version: 1.2.5(lodash@4.17.21)
+  deep-object-diff:
+    specifier: ^1.1.9
+    version: 1.1.9
   langchain:
     specifier: ^0.0.70
     version: 0.0.70
@@ -449,6 +449,10 @@ packages:
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     dev: true
 
+  /deep-object-diff@1.1.9:
+    resolution: {integrity: sha512-Rn+RuwkmkDwCi2/oXOFS9Gsr5lJZu/yTGpK7wAaAIE75CC+LCGEZHpY6VQJa/RoJcrmaA/docWJZvYohlNkWPA==}
+    dev: false
+
   /define-properties@1.2.0:
     resolution: {integrity: sha512-xvqAVKGfT1+UAvPwKTVw/njhdQ8ZhXK4lI0bCIuCMrp2up9nPnaDftrLtmpTazqd1o+UY4zgzU+avtMbDP+ldA==}
     engines: {node: '>= 0.4'}
@@ -846,14 +850,6 @@ packages:
       argparse: 2.0.1
     dev: true
 
-  /json-diff-ts@1.2.5(lodash@4.17.21):
-    resolution: {integrity: sha512-36KYoqcm+i246hWpkk0ovVAL5LyO8ZQQRNavJkw4YlFNtAzVdvMUzYG3pSaJ5wvUCDwZrwpJmpX27n6EzNu0uA==}
-    peerDependencies:
-      lodash: ^4.x
-    dependencies:
-      lodash: 4.17.21
-    dev: false
-
   /json-parse-even-better-errors@2.3.1:
     resolution: {integrity: sha512-xyFwyhro/JEof6Ghe2iz2NcXoj2sloNsWr/XsERDK/oiPCfaNhl5ONfp+jQdAZRQQ0IJWNzH9zIZF7li91kh2w==}
     dev: true
@@ -1017,10 +1013,6 @@ packages:
     dependencies:
       p-locate: 6.0.0
     dev: true
-
-  /lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: false
 
   /log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}

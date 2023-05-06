@@ -1,16 +1,14 @@
 import { Splitter, jsonTokenLength } from '.';
-import { diff } from "json-diff-ts";
+import { addedDiff, deletedDiff } from 'deep-object-diff';
 
-export default class implements Splitter {
+export default class implements Splitter<Record<string, string>> {
     constructor(
         private readonly chunkSize: number = 500,
-        private readonly tabSize: number = 4
     ) { }
 
-    split(text: string): string[] {
-        const data: Record<string, string> = JSON.parse(text);
+    split(data: Record<string, string>): Record<string, string>[] {
         let left: Record<string, string> = {};
-        const result: string[] = [];
+        const result: Record<string, string>[] = [];
         const start = 2;
         let length = start;
 
@@ -21,55 +19,54 @@ export default class implements Splitter {
                 left[key] = value;
                 length += len;
             } else {
-                result.push(JSON.stringify(left));
+                result.push(left);
                 left = { [key]: value };
                 length = len + start;
             }
         }
 
         if (length > start) {
-            result.push(JSON.stringify(left));
+            result.push(left);
         }
 
         return result;
     }
 
-    join(texts: string[]): string {
+    join(chunks: Record<string, string>[]): Record<string, string> {
         const data: Record<string, string> = {};
 
-        for (const text of texts) {
-            const chunk: Record<string, string> = JSON.parse(text);
-
+        for (const chunk of chunks) {
             for (const [key, value] of Object.entries(chunk)) {
                 data[key] = value;
             }
         }
 
-        return JSON.stringify(data, null, this.tabSize);
+        return data;
     }
 
-    diff(srcText: string, dstText: string): [string, string] {
-        const src = JSON.parse(srcText);
-        const dst = dstText ? JSON.parse(dstText) : {};
-        const patch: Record<string, string> = {};
-        const diffs = diff(dst, src);
-
-        for (const diff of diffs) {
-            if (diff.type === 'ADD') {
-                patch[diff.key] = src[diff.key];
-            } else if (diff.type === 'REMOVE') {
-                delete dst[diff.key];
-            }
+    diff(src: Record<string, string>, dst: Record<string, string> | null): [Record<string, string>, Record<string, string>] {
+        if (dst === null) {
+            dst = {};
         }
 
-        return [JSON.stringify(dst), JSON.stringify(patch)];
+        const patch: Record<string, string> = {};
+        const addedDiffs = addedDiff(dst, src) as Record<string, string>;
+
+        for (const [key, value] of Object.entries(addedDiffs)) {
+            patch[key] = value;
+        }
+
+        const deletedDiffs = deletedDiff(dst, src) as Record<string, string>;
+
+        for (const key of Object.keys(deletedDiffs)) {
+            delete dst[key];
+        }
+
+        return [dst, patch];
     }
 
-    merge(srcText: string, patchText: string): string {
-        const src = JSON.parse(srcText);
-        const patch = JSON.parse(patchText);
+    merge(src: Record<string, string>, patch: Record<string, string>): Record<string, string> {
         Object.assign(src, patch);
-
-        return JSON.stringify(src, null, this.tabSize);
+        return src;
     }
 }

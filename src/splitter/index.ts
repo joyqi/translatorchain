@@ -6,6 +6,18 @@ export type SplitterType = {
     splitter: kv
 };
 
+// diff(src, dst) => [keep, patch]
+// split(patch) => [patch1, patch2, ...]
+// translate [patch1, patch2, ...] => [translated_patch1, translated_patch2, ...]
+// join([translated_patch1, translated_patch2, ...]) => translated_patch
+// merge(keep, translated_patch) => translated
+export interface Splitter<T extends any> {
+    split: (data: T) => T[];
+    join: (chunks: T[]) => T;
+    diff: (src: T, dst: T | null) => [T, T];
+    merge: (src: T, patch: T) => T;
+}
+
 function getSpliter<T extends SplitterType>(type: T['type']): T['splitter'] {
     switch (type) {
         case 'kv':
@@ -15,35 +27,37 @@ function getSpliter<T extends SplitterType>(type: T['type']): T['splitter'] {
     }
 }
 
-// diff(src, dst) => [keep, patch]
-// split(patch) => [patch1, patch2, ...]
-// translate [patch1, patch2, ...] => [translated_patch1, translated_patch2, ...]
-// join([translated_patch1, translated_patch2, ...]) => translated_patch
-// merge(keep, translated_patch) => translated
-export interface Splitter {
-    split: (text: string) => string[];
-    join: (texts: string[]) => string;
-    diff: (srcText: string, dstText: string) => [string, string];
-    merge: (srcText: string, patchText: string) => string;
-}
-
 export function jsonTokenLength(text: string, model: TiktokenModel = 'text-davinci-003'): number {
     const enc = encoding_for_model(model);
     return enc.encode(JSON.stringify(text)).length;
 }
 
-export function split<T extends SplitterType>(type: T['type'], text: string): string[] {
-    return getSpliter(type).split(text);
+export function split<T extends SplitterType>(
+    type: T['type'],
+    data: Parameters<T['splitter']['split']>[0]
+) {
+    return getSpliter(type).split(data);
 }
 
-export function join<T extends SplitterType>(type: T['type'], texts: string[]): string {
-    return getSpliter(type).join(texts);
+export function join<T extends SplitterType>(
+    type: T['type'],
+    chunks: Parameters<T['splitter']['join']>[0]
+) {
+    return getSpliter(type).join(chunks);
 }
 
-export function diff<T extends SplitterType>(type: T['type'], srcText: string, dstText: string): [string, string] {
-    return getSpliter(type).diff(srcText, dstText);
+export function diff<T extends SplitterType>(
+    type: T['type'],
+    src: Parameters<T['splitter']['diff']>[0],
+    dst: Parameters<T['splitter']['diff']>[1]
+) {
+    return getSpliter(type).diff(src, dst);
 }
 
-export function merge<T extends SplitterType>(type: T['type'], srcText: string, patchText: string): string {
-    return getSpliter(type).merge(srcText, patchText);
+export function merge<T extends SplitterType>(
+    type: T['type'],
+    src: Parameters<T['splitter']['merge']>[0],
+    patch: Parameters<T['splitter']['merge']>[1]
+) {
+    return getSpliter(type).merge(src, patch);
 }
