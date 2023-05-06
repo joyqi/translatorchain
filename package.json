@@ -24,6 +24,9 @@
   "main": "lib/cjs/index.js",
   "module": "lib/mjs/index.js",
   "types": "lib/types/index.d.ts",
+  "bin": {
+    "tc": "./lib/cjs/cli.js"
+  },
   "scripts": {
     "clear": "rm -rf ./lib",
     "patch:esm-js": "npx tsc-esm-fix --tsconfig=tsconfig.mjs.json",
@@ -34,12 +37,19 @@
     "test": "npx mocha"
   },
   "devDependencies": {
-    "@types/node": "latest",
     "@types/mocha": "latest",
+    "@types/node": "latest",
+    "@types/yargs": "^17.0.24",
     "assert": "latest",
     "mocha": "latest",
     "ts-node": "latest",
     "tsc-esm-fix": "latest",
     "typescript": "latest"
+  },
+  "dependencies": {
+    "@dqbd/tiktoken": "^1.0.7",
+    "json-diff-ts": "^1.2.5",
+    "langchain": "^0.0.70",
+    "yargs": "^17.7.2"
   }
 }
