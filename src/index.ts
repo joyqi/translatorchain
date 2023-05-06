@@ -4,7 +4,6 @@ import { ChatOpenAI } from 'langchain/chat_models/openai';
 import {
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
-    PromptTemplate,
     SystemMessagePromptTemplate,
 } from 'langchain/prompts';
 import { LLMChain } from 'langchain/chains';
