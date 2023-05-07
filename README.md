@@ -27,6 +27,19 @@ tc -k <api-key> -o <output-file> <input-file>
 
 You can specify the OpenAI API key using the `-k` flag or by setting the `OPENAI_API_KEY` environment variable.
 
+Sammple `key-value`(`kv`) input file:
+
+```json
+{
+    "lang": "中文(简体)",
+    "description": "这是一个自动翻译工具。",
+    "hello": "你好，世界！",
+    "goodbye": "再见！",
+    "login": "登录",
+    "logout": "登出"
+}
+```
+
 Supported arguments:
 
 - `-k`, `--key`: OpenAI API key
