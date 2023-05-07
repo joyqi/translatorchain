@@ -36,4 +36,5 @@ Supported arguments:
 - `-f`, `--format`: Input file format (default: `json`)
 - `-t`, `--type`: Data structure type (default: `kv`)
 - `-c`, `--chunk`: Chunk size (default: `500`)
+- `-m`, `--model`: GPT chat model (default: `gpt-3.5-turbo`)
 - `-h`, `--help`: Show help

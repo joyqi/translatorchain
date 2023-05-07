@@ -54,6 +54,13 @@ const argv = yargs(hideBin(process.argv))
         demandOption: true,
         default: 500
     })
+    .option('model', {
+        alias: 'm',
+        type: 'string',
+        description: 'Chat Model',
+        demandOption: true,
+        default: 'gpt-3.5-turbo'
+    })
     .check((argv) => {
         const filePaths = argv._;
         if (filePaths.length !== 1) {
@@ -67,15 +74,16 @@ const argv = yargs(hideBin(process.argv))
     .argv;
 
 (async () => {
-    const { key, format, output, type, src, dst, chunk, _ } = await argv;
+    const { key, model, format, output, type, src, dst, chunk, _ } = await argv;
     translate(
         type as any,
         format as any,
-        key as string,
+        key,
+        model,
         _[0] as string,
-        output as string,
-        src as string,
-        dst as string,
+        output,
+        src,
+        dst,
         chunk
     );
 })();

@@ -59,6 +59,7 @@ export async function translate<T extends SplitterType, F extends FormatterType>
     type: T['type'],
     format: F['type'],
     openAIApiKey: string,
+    model: string,
     srcFile: string,
     dstFile: string,
     srcLang: string,
@@ -67,7 +68,8 @@ export async function translate<T extends SplitterType, F extends FormatterType>
 ): Promise<void> {
     const chat = new ChatOpenAI({
         temperature: 0,
-        openAIApiKey
+        openAIApiKey,
+        modelName: model,
     });
 
     const chatPrompt = ChatPromptTemplate.fromPromptMessages([
