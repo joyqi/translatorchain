@@ -27,7 +27,7 @@ tc -k <api-key> -o <output-file> <input-file>
 
 You can specify the OpenAI API key using the `-k` flag or by setting the `OPENAI_API_KEY` environment variable.
 
-Sammple `key-value`(`kv`) input file:
+Sample `key-value`(`kv`) input file:
 
 ```json
 {
