@@ -2,6 +2,12 @@
 
 A Node.js command line tool to translate formatted localized strings into other languages using OpenAI's GPT API.
 
+## Features
+
+- 🤖️ Translate strings in a file using OpenAI's GPT API.
+- 🚀 Automatically split strings into chunks by GPT's max token length.
+- 💰 Compare the strings to a list of previously translated strings and only translate those that have not been translated yet.
+
 ## How it works
 
 1. Read a file containing a list of strings to translate.
