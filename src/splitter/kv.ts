@@ -2,11 +2,7 @@ import { Splitter, jsonTokenLength } from '.';
 import { addedDiff, deletedDiff } from 'deep-object-diff';
 
 export default class implements Splitter<Record<string, string>> {
-    constructor(
-        private readonly chunkSize: number = 500,
-    ) { }
-
-    split(data: Record<string, string>): Record<string, string>[] {
+    split(data: Record<string, string>, chunkSize = 500): Record<string, string>[] {
         let left: Record<string, string> = {};
         const result: Record<string, string>[] = [];
         const start = 2;
@@ -15,7 +11,7 @@ export default class implements Splitter<Record<string, string>> {
         for (const [key, value] of Object.entries(data)) {
             const len = jsonTokenLength(key) + jsonTokenLength(value) + 2;
 
-            if (length + len < this.chunkSize) {
+            if (length + len < chunkSize) {
                 left[key] = value;
                 length += len;
             } else {

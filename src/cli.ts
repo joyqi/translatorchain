@@ -33,19 +33,26 @@ const argv = yargs(hideBin(process.argv))
         demandOption: true,
         default: 'json'
     })
-    .options('src', {
+    .option('src', {
         alias: 's',
         type: 'string',
         description: 'Source language',
         demandOption: true,
-        default: 'Chinese'
+        default: 'auto'
     })
-    .options('dst', {
+    .option('dst', {
         alias: 'd',
         type: 'string',
         description: 'Destination language',
         demandOption: true,
         default: 'English'
+    })
+    .option('chunk', {
+        alias: 'c',
+        type: 'number',
+        description: 'Chunk size',
+        demandOption: true,
+        default: 500
     })
     .check((argv) => {
         const filePaths = argv._;
@@ -60,7 +67,7 @@ const argv = yargs(hideBin(process.argv))
     .argv;
 
 (async () => {
-    const { key, format, output, type, src, dst, _ } = await argv;
+    const { key, format, output, type, src, dst, chunk, _ } = await argv;
     translate(
         type as any,
         format as any,
@@ -68,6 +75,7 @@ const argv = yargs(hideBin(process.argv))
         _[0] as string,
         output as string,
         src as string,
-        dst as string
+        dst as string,
+        chunk
     );
 })();

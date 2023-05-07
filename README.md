@@ -22,7 +22,18 @@ npm install -g translatorchain
 ## Usage
 
 ```bash
-tc -k <api-key> -o <output-file> -d <dest-language> -s <src-language> <input-file>
+tc -k <api-key> -o <output-file> <input-file>
 ```
 
 You can specify the OpenAI API key using the `-k` flag or by setting the `OPENAI_API_KEY` environment variable.
+
+Supported arguments:
+
+- `-k`, `--key`: OpenAI API key
+- `-o`, `--output`: Output file
+- `-s`, `--src`: Source language (default: `auto`, detected automatically)
+- `-d`, `--dst`: Destination language (default: `English`)
+- `-f`, `--format`: Input file format (default: `json`)
+- `-t`, `--type`: Data structure type (default: `kv`)
+- `-c`, `--chunk`: Chunk size (default: `500`)
+- `-h`, `--help`: Show help

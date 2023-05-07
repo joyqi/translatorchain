@@ -12,7 +12,7 @@ export type SplitterType = {
 // join([translated_patch1, translated_patch2, ...]) => translated_patch
 // merge(keep, translated_patch) => translated
 export interface Splitter<T extends any> {
-    split: (data: T) => T[];
+    split: (data: T, chunkSize: number) => T[];
     join: (chunks: T[]) => T;
     diff: (src: T, dst: T | null) => [T, T];
     merge: (src: T, patch: T) => T;
@@ -34,9 +34,10 @@ export function jsonTokenLength(text: string, model: TiktokenModel = 'text-davin
 
 export function split<T extends SplitterType>(
     type: T['type'],
-    data: Parameters<T['splitter']['split']>[0]
+    data: Parameters<T['splitter']['split']>[0],
+    chunkSize: Parameters<T['splitter']['split']>[1]
 ) {
-    return getSpliter(type).split(data);
+    return getSpliter(type).split(data, chunkSize);
 }
 
 export function join<T extends SplitterType>(

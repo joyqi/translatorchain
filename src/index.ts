@@ -28,6 +28,8 @@ yargs(hideBin(process.argv))
 async function detectLanguage(chat: ChatOpenAI, langText: string): Promise<string> {
     if (langText.match(/^[A-Z][a-z]{2,}$/)) {
         return langText;
+    } else if (langText === 'auto') {
+        return 'any language';
     }
 
     const chatPrompt = ChatPromptTemplate.fromPromptMessages([
@@ -60,7 +62,8 @@ export async function translate<T extends SplitterType, F extends FormatterType>
     srcFile: string,
     dstFile: string,
     srcLang: string,
-    dstLang: string
+    dstLang: string,
+    chunkSize: number
 ): Promise<void> {
     const chat = new ChatOpenAI({
         temperature: 0,
@@ -69,7 +72,7 @@ export async function translate<T extends SplitterType, F extends FormatterType>
 
     const chatPrompt = ChatPromptTemplate.fromPromptMessages([
         SystemMessagePromptTemplate.fromTemplate(
-            'You are a helpful assistant that translates {input_language} to {output_language} in json format.'
+            'You are a helpful assistant that translates {input_language} to {output_language} and keeps the original format.'
         ),
         HumanMessagePromptTemplate.fromTemplate('{text}'),
     ]);
@@ -89,9 +92,9 @@ export async function translate<T extends SplitterType, F extends FormatterType>
     const src = unmarshal(format, srcText);
     const dst = unmarshal(format, dstText);
     const [keep, patch] = diff(type, src, dst);
-    const chunks = split(type, patch);
+    const chunks = split(type, patch, chunkSize);
     const translated = [];
-    console.log(`Translating ${chunks.length} chunks...`);
+    console.log(`Translating ${chunks.length} chunks of size ${chunkSize}...`);
 
     for (const chunk of chunks) {
         const { text } = await chain.call({
