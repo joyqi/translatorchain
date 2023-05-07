@@ -33,7 +33,25 @@ tc -k <api-key> -o <output-file> <input-file>
 
 You can specify the OpenAI API key using the `-k` flag or by setting the `OPENAI_API_KEY` environment variable.
 
-Sample `key-value`(`kv`) input file:
+Supported arguments:
+
+- `-k`, `--key`: OpenAI API key
+- `-o`, `--output`: Output file
+- `-s`, `--src`: Source language (default: `auto`, detected automatically)
+- `-d`, `--dst`: Destination language (default: `English`)
+- `-f`, `--format`: Input file format (default: `auto`, detected automatically)
+- `-t`, `--type`: Data structure type (default: `kv`)
+- `-c`, `--chunk`: Chunk size (default: `500`)
+- `-m`, `--model`: GPT chat model (default: `gpt-3.5-turbo`)
+- `-h`, `--help`: Show help
+
+## Supported data structure types (`-t` flag)
+
+### `kv`
+
+Key-value pairs.
+
+Sample input file(json format):
 
 ```json
 {
@@ -46,14 +64,29 @@ Sample `key-value`(`kv`) input file:
 }
 ```
 
-Supported arguments:
+### `tree`
 
-- `-k`, `--key`: OpenAI API key
-- `-o`, `--output`: Output file
-- `-s`, `--src`: Source language (default: `auto`, detected automatically)
-- `-d`, `--dst`: Destination language (default: `English`)
-- `-f`, `--format`: Input file format (default: `json`)
-- `-t`, `--type`: Data structure type (default: `kv`)
-- `-c`, `--chunk`: Chunk size (default: `500`)
-- `-m`, `--model`: GPT chat model (default: `gpt-3.5-turbo`)
-- `-h`, `--help`: Show help
+Tree structure.
+
+Sample input file(json format):
+
+```json
+{
+    "lang": "中文(简体)",
+    "description": "这是一个自动翻译工具。",
+    "hello": "你好，世界！",
+    "goodbye": "再见！",
+    "login": "登录",
+    "logout": "登出",
+    "menu": {
+        "home": "主页",
+        "about": "关于",
+        "contact": "联系我们"
+    }
+}
+```
+## Supported file formats (`-f` flag)
+
+* `auto`: Automatically detect the file format.
+* `json`: JSON format.
+* `yaml`: YAML format.

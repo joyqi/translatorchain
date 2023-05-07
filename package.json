@@ -38,6 +38,8 @@
     "test": "npx mocha"
   },
   "devDependencies": {
+    "@types/flat": "^5.0.2",
+    "@types/js-yaml": "^4.0.5",
     "@types/mocha": "latest",
     "@types/node": "latest",
     "@types/yargs": "^17.0.24",
@@ -50,6 +52,8 @@
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.7",
     "deep-object-diff": "^1.1.9",
+    "flat": "^5.0.2",
+    "js-yaml": "^4.1.0",
     "langchain": "^0.0.70",
     "yargs": "^17.7.2"
   }

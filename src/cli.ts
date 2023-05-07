@@ -21,7 +21,7 @@ const argv = yargs(hideBin(process.argv))
         alias: 't',
         type: 'string',
         description: 'The type of the file splitter',
-        choices: ['kv'],
+        choices: ['kv', 'tree'],
         demandOption: true,
         default: 'kv'
     })
@@ -29,9 +29,9 @@ const argv = yargs(hideBin(process.argv))
         alias: 'f',
         type: 'string',
         description: 'The type of the file formatter',
-        choices: ['json'],
+        choices: ['auto', 'json', 'yaml'],
         demandOption: true,
-        default: 'json'
+        default: 'auto'
     })
     .option('src', {
         alias: 's',
@@ -79,7 +79,7 @@ const argv = yargs(hideBin(process.argv))
         type as any,
         format as any,
         key,
-        model,
+        model as any,
         _[0] as string,
         output,
         src,

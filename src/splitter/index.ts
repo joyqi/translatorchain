@@ -1,9 +1,13 @@
-import { TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
-import kv from './kv';
+import { Tiktoken, TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
+import KV from './kv';
+import Tree from './tree';
 
 export type SplitterType = {
     type: 'kv',
-    splitter: kv
+    splitter: KV
+} | {
+    type: 'tree',
+    splitter: Tree
 };
 
 // diff(src, dst) => [keep, patch]
@@ -12,7 +16,7 @@ export type SplitterType = {
 // join([translated_patch1, translated_patch2, ...]) => translated_patch
 // merge(keep, translated_patch) => translated
 export interface Splitter<T extends any> {
-    split: (data: T, chunkSize: number) => T[];
+    split: (data: T, enc: Tiktoken, chunkSize: number) => T[];
     join: (chunks: T[]) => T;
     diff: (src: T, dst: T | null) => [T, T];
     merge: (src: T, patch: T) => T;
@@ -21,23 +25,25 @@ export interface Splitter<T extends any> {
 function getSpliter<T extends SplitterType>(type: T['type']): T['splitter'] {
     switch (type) {
         case 'kv':
-            return new kv();
+            return new KV();
+        case 'tree':
+            return new Tree();
         default:
             throw new Error(`Unknown splitter type: ${type}`);
     }
 }
 
-export function jsonTokenLength(text: string, model: TiktokenModel = 'text-davinci-003'): number {
-    const enc = encoding_for_model(model);
+export function jsonTokenLength(text: string, enc: Tiktoken): number {
     return enc.encode(JSON.stringify(text)).length;
 }
 
 export function split<T extends SplitterType>(
     type: T['type'],
     data: Parameters<T['splitter']['split']>[0],
-    chunkSize: Parameters<T['splitter']['split']>[1]
+    enc: Parameters<T['splitter']['split']>[1],
+    chunkSize: Parameters<T['splitter']['split']>[2]
 ) {
-    return getSpliter(type).split(data, chunkSize);
+    return getSpliter(type).split(data, enc, chunkSize);
 }
 
 export function join<T extends SplitterType>(

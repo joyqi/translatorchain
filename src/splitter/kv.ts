@@ -1,15 +1,18 @@
+import { Tiktoken } from '@dqbd/tiktoken';
 import { Splitter, jsonTokenLength } from '.';
 import { addedDiff, deletedDiff } from 'deep-object-diff';
 
-export default class implements Splitter<Record<string, string>> {
-    split(data: Record<string, string>, chunkSize = 500): Record<string, string>[] {
-        let left: Record<string, string> = {};
-        const result: Record<string, string>[] = [];
+type KVStructure = Record<string, string>;
+
+export default class implements Splitter<KVStructure> {
+    split(data: KVStructure, enc: Tiktoken, chunkSize: number): KVStructure[] {
+        let left: KVStructure = {};
+        const result: KVStructure[] = [];
         const start = 2;
         let length = start;
 
         for (const [key, value] of Object.entries(data)) {
-            const len = jsonTokenLength(key) + jsonTokenLength(value) + 2;
+            const len = jsonTokenLength(key, enc) + jsonTokenLength(value, enc) + 2;
 
             if (length + len < chunkSize) {
                 left[key] = value;
@@ -28,8 +31,8 @@ export default class implements Splitter<Record<string, string>> {
         return result;
     }
 
-    join(chunks: Record<string, string>[]): Record<string, string> {
-        const data: Record<string, string> = {};
+    join(chunks: KVStructure[]): KVStructure {
+        const data: KVStructure = {};
 
         for (const chunk of chunks) {
             for (const [key, value] of Object.entries(chunk)) {
@@ -40,19 +43,19 @@ export default class implements Splitter<Record<string, string>> {
         return data;
     }
 
-    diff(src: Record<string, string>, dst: Record<string, string> | null): [Record<string, string>, Record<string, string>] {
+    diff(src: KVStructure, dst: KVStructure | null): [KVStructure, KVStructure] {
         if (dst === null) {
             dst = {};
         }
 
-        const patch: Record<string, string> = {};
-        const addedDiffs = addedDiff(dst, src) as Record<string, string>;
+        const patch: KVStructure = {};
+        const addedDiffs = addedDiff(dst, src) as KVStructure;
 
         for (const [key, value] of Object.entries(addedDiffs)) {
             patch[key] = value;
         }
 
-        const deletedDiffs = deletedDiff(dst, src) as Record<string, string>;
+        const deletedDiffs = deletedDiff(dst, src) as KVStructure;
 
         for (const key of Object.keys(deletedDiffs)) {
             delete dst[key];
@@ -61,7 +64,7 @@ export default class implements Splitter<Record<string, string>> {
         return [dst, patch];
     }
 
-    merge(src: Record<string, string>, patch: Record<string, string>): Record<string, string> {
+    merge(src: KVStructure, patch: KVStructure): KVStructure {
         Object.assign(src, patch);
         return src;
     }

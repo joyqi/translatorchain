@@ -9,7 +9,8 @@ import {
 import { LLMChain } from 'langchain/chains';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { SplitterType, diff, join, merge, split } from './splitter';
-import { FormatterType, unmarshal, marshal } from './formatter';
+import { FormatterType, unmarshal, marshal, detectFormatterType } from './formatter';
+import { TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
 
 yargs(hideBin(process.argv))
     .command('tc [file]', 'Translate formated file', (yargs) => {
@@ -57,9 +58,9 @@ async function detectLanguage(chat: ChatOpenAI, langText: string): Promise<strin
 
 export async function translate<T extends SplitterType, F extends FormatterType>(
     type: T['type'],
-    format: F['type'],
+    format: F['type'] | 'auto',
     openAIApiKey: string,
-    model: string,
+    model: TiktokenModel,
     srcFile: string,
     dstFile: string,
     srcLang: string,
@@ -84,6 +85,10 @@ export async function translate<T extends SplitterType, F extends FormatterType>
         llm: chat,
     });
 
+    if (format === 'auto') {
+        format = detectFormatterType(srcFile);
+    }
+
     srcLang = await detectLanguage(chat, srcLang);
     dstLang = await detectLanguage(chat, dstLang);
 
@@ -94,7 +99,8 @@ export async function translate<T extends SplitterType, F extends FormatterType>
     const src = unmarshal(format, srcText);
     const dst = unmarshal(format, dstText);
     const [keep, patch] = diff(type, src, dst);
-    const chunks = split(type, patch, chunkSize);
+    const enc = encoding_for_model(model);
+    const chunks = split(type, patch, enc, chunkSize);
     const translated = [];
     console.log(`Translating ${chunks.length} chunks of size ${chunkSize}...`);
 
