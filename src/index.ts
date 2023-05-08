@@ -8,9 +8,10 @@ import {
 } from 'langchain/prompts';
 import { LLMChain } from 'langchain/chains';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { SplitterType, diff, join, merge, split } from './splitter';
+import { StructureType, detectStructureType, diff, join, merge, split } from './structure';
 import { FormatterType, unmarshal, marshal, detectFormatterType } from './formatter';
 import { TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
+import ora from 'ora';
 
 yargs(hideBin(process.argv))
     .command('tc [file]', 'Translate formated file', (yargs) => {
@@ -26,6 +27,20 @@ yargs(hideBin(process.argv))
         description: 'OpenAI API key',
     }).parse();
 
+// Build the chat model
+function buildChain(chat: ChatOpenAI, systemMessage: string): LLMChain {
+    const chatPrompt = ChatPromptTemplate.fromPromptMessages([
+        SystemMessagePromptTemplate.fromTemplate(systemMessage),
+        HumanMessagePromptTemplate.fromTemplate('{text}'),
+    ]);
+
+    return new LLMChain({
+        prompt: chatPrompt,
+        llm: chat,
+    });
+}
+
+// Detect the language name from user input
 async function detectLanguage(chat: ChatOpenAI, langText: string): Promise<string> {
     if (langText.match(/^[A-Z][a-z]{2,}$/)) {
         return langText;
@@ -33,34 +48,43 @@ async function detectLanguage(chat: ChatOpenAI, langText: string): Promise<strin
         return 'any language';
     }
 
-    const chatPrompt = ChatPromptTemplate.fromPromptMessages([
-        SystemMessagePromptTemplate.fromTemplate(
-            'You are a helpful assistant that directly print the language name in English.'
-        ),
-        HumanMessagePromptTemplate.fromTemplate('{text}'),
-    ]);
-
-    const chain = new LLMChain({
-        prompt: chatPrompt,
-        llm: chat,
-    });
-
-    console.log(`Detecting language of ${langText}`);
+    const chain = buildChain(chat, 'You are a helpful assistant that directly print the language name in English.');
+    const spinner = ora(`Detecting ${langText}`).start();
 
     const { text } = await chain.call({
         text: langText
     });
 
-    console.log(`Detected language of ${langText} is ${text}`);
+    spinner.succeed(`Detected ${text}`);
 
     return text;
 }
 
-export async function translate<T extends SplitterType, F extends FormatterType>(
-    type: T['type'],
+// Detect the prompt text from user input
+async function detectPrompt(chat: ChatOpenAI, promptText: string | null): Promise<string> {
+    if (!promptText) {
+        return '';
+    }
+
+    const chain = buildChain(chat, 'You are a helpful assistant that writes the summarize of the text, rephrasing it in English as the second half of the following sentence: {input}.');
+    const spinner = ora(`Detecting ${promptText}`).start();
+
+    const { text } = await chain.call({
+        input: 'This input data is about',
+        text: promptText
+    });
+
+    spinner.succeed(`Detected ${text}`);
+
+    return text;
+}
+
+export async function translate<T extends StructureType, F extends FormatterType>(
+    type: T['type'] | 'auto',
     format: F['type'] | 'auto',
     openAIApiKey: string,
     model: TiktokenModel,
+    prompt: string | null,
     srcFile: string,
     dstFile: string,
     srcLang: string,
@@ -73,17 +97,8 @@ export async function translate<T extends SplitterType, F extends FormatterType>
         modelName: model,
     });
 
-    const chatPrompt = ChatPromptTemplate.fromPromptMessages([
-        SystemMessagePromptTemplate.fromTemplate(
-            'You are a helpful assistant that translates {input_language} to {output_language} and keeps the original format.'
-        ),
-        HumanMessagePromptTemplate.fromTemplate('{text}'),
-    ]);
-
-    const chain = new LLMChain({
-        prompt: chatPrompt,
-        llm: chat,
-    });
+    const chain = buildChain(chat, 'You are a helpful assistant that translates json formatted data from {input_language} to {output_language}. {prompt}');
+    const enc = encoding_for_model(model);
 
     if (format === 'auto') {
         format = detectFormatterType(srcFile);
@@ -91,30 +106,49 @@ export async function translate<T extends SplitterType, F extends FormatterType>
 
     srcLang = await detectLanguage(chat, srcLang);
     dstLang = await detectLanguage(chat, dstLang);
-
-    console.log(`Translating ${srcFile} by ${srcLang} to ${dstFile} by ${dstLang}`);
+    prompt = await detectPrompt(chat, prompt);
 
     const srcText = readFileSync(srcFile, 'utf-8');
     const dstText = existsSync(dstFile) ? readFileSync(dstFile, 'utf-8') : '';
     const src = unmarshal(format, srcText);
     const dst = unmarshal(format, dstText);
+
+    if (type === 'auto') {
+        type = detectStructureType(src);
+    }
+
     const [keep, patch] = diff(type, src, dst);
-    const enc = encoding_for_model(model);
     const chunks = split(type, patch, enc, chunkSize);
     const translated = [];
-    console.log(`Translating ${chunks.length} chunks of size ${chunkSize}...`);
+
+    console.table({
+        'Model': model,
+        'Format': format,
+        'Structure': type,
+        'Source File': srcFile,
+        'Destination File': dstFile,
+        'Source Language': srcLang,
+        'Destination Language': dstLang,
+        'Chunk Size': chunkSize,
+        'Chunks': chunks.length,
+    });
+
+    const spinner = ora('Start translating').start();
 
     for (const chunk of chunks) {
+        spinner.text = `Translating ${translated.length + 1}/${chunks.length} chunks`;
+
         const { text } = await chain.call({
             input_language: srcLang,
             output_language: dstLang,
+            prompt,
             text: JSON.stringify(chunk)
         });
 
         translated.push(JSON.parse(text));
-        console.log(`Translated ${translated.length} chunks...`);
     }
 
+    spinner.succeed(`Translated ${chunks.length} chunks`);
     const translatedPatch = join(type, translated);
     const translatedData = merge(type, keep, translatedPatch);
 

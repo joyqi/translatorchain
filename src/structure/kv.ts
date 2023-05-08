@@ -1,10 +1,10 @@
 import { Tiktoken } from '@dqbd/tiktoken';
-import { Splitter, jsonTokenLength } from '.';
+import { Structure, jsonTokenLength } from '.';
 import { addedDiff, deletedDiff } from 'deep-object-diff';
 
 type KVStructure = Record<string, string>;
 
-export default class implements Splitter<KVStructure> {
+export default class implements Structure<KVStructure> {
     split(data: KVStructure, enc: Tiktoken, chunkSize: number): KVStructure[] {
         let left: KVStructure = {};
         const result: KVStructure[] = [];

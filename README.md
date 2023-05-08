@@ -40,9 +40,10 @@ Supported arguments:
 - `-s`, `--src`: Source language (default: `auto`, detected automatically)
 - `-d`, `--dst`: Destination language (default: `English`)
 - `-f`, `--format`: Input file format (default: `auto`, detected automatically)
-- `-t`, `--type`: Data structure type (default: `kv`)
+- `-t`, `--type`: Data structure type (default: `auto`, detected automatically)
 - `-c`, `--chunk`: Chunk size (default: `500`)
-- `-m`, `--model`: GPT chat model (default: `gpt-3.5-turbo`)
+- `-m`, `--model`: GPT chat model (default: `gpt-3.5-turbo-0301`)
+- `-p`, `--prompt`: GPT prompt to describe what the translation document is about (e.g. `This is a iOS app to help you learn English.`)
 - `-h`, `--help`: Show help
 
 ## Supported data structure types (`-t` flag)

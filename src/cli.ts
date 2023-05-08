@@ -21,9 +21,9 @@ const argv = yargs(hideBin(process.argv))
         alias: 't',
         type: 'string',
         description: 'The type of the file splitter',
-        choices: ['kv', 'tree'],
+        choices: ['auto', 'kv', 'tree'],
         demandOption: true,
-        default: 'kv'
+        default: 'auto'
     })
     .option('format', {
         alias: 'f',
@@ -59,7 +59,13 @@ const argv = yargs(hideBin(process.argv))
         type: 'string',
         description: 'Chat Model',
         demandOption: true,
-        default: 'gpt-3.5-turbo'
+        default: 'gpt-3.5-turbo-0301'
+    })
+    .option('prompt', {
+        alias: 'p',
+        type: 'string',
+        description: 'Background text',
+        default: null
     })
     .check((argv) => {
         const filePaths = argv._;
@@ -74,12 +80,13 @@ const argv = yargs(hideBin(process.argv))
     .argv;
 
 (async () => {
-    const { key, model, format, output, type, src, dst, chunk, _ } = await argv;
+    const { key, model, format, output, type, src, dst, chunk, prompt, _ } = await argv;
     translate(
         type as any,
         format as any,
         key,
         model as any,
+        prompt,
         _[0] as string,
         output,
         src,

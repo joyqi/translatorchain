@@ -1,11 +1,11 @@
 import { Tiktoken } from '@dqbd/tiktoken';
-import { Splitter } from '.';
+import { Structure } from '.';
 import kv from "./kv";
 import { flatten, unflatten } from "flat";
 
 type TreeStructure = Record<string, any>;
 
-export default class implements Splitter<TreeStructure> {
+export default class implements Structure<TreeStructure> {
     private kv = new kv();
 
     split(data: TreeStructure, enc: Tiktoken, chunkSize: number): TreeStructure[] {
