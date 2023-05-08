@@ -48,6 +48,10 @@ Supported arguments:
 
 ## Supported data structure types (`-t` flag)
 
+### `auto`
+
+Automatically detect the data structure type.
+
 ### `kv`
 
 Key-value pairs.
