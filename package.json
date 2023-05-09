@@ -53,7 +53,7 @@
     "@dqbd/tiktoken": "^1.0.7",
     "deep-object-diff": "^1.1.9",
     "detect-file-encoding-and-language": "^2.3.3",
-    "detect-indent": "^7.0.1",
+    "detect-indent": "^6.0.0",
     "flat": "^5.0.2",
     "js-yaml": "^4.1.0",
     "langchain": "^0.0.70",
