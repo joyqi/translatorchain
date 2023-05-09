@@ -6,7 +6,7 @@ export default class implements Formatter {
         return text ? load(text) : null;
     }
 
-    marshal(data: any): string {
-        return dump(data);
+    marshal(data: any, indent: number): string {
+        return dump(data, { indent });
     }
 }

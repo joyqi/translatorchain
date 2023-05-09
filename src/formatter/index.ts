@@ -12,7 +12,7 @@ export type FormatterType = {
 
 export interface Formatter {
     unmarshal: (text: string) => any;
-    marshal: (data: any) => string;
+    marshal: (data: any, indent: number) => string;
 }
 
 function getFormatter<T extends FormatterType>(type: T['type']): T['formatter'] {
@@ -49,7 +49,8 @@ export function unmarshal<T extends FormatterType>(
 
 export function marshal<T extends FormatterType>(
     type: T['type'],
-    data: Parameters<T['formatter']['marshal']>[0]
+    data: Parameters<T['formatter']['marshal']>[0],
+    indent: Parameters<T['formatter']['marshal']>[1]
 ) {
-    return getFormatter(type).marshal(data);
+    return getFormatter(type).marshal(data, indent);
 }

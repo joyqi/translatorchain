@@ -5,7 +5,7 @@ export default class implements Formatter {
         return text ? JSON.parse(text) : null;
     }
 
-    marshal(data: any): string {
-        return JSON.stringify(data, null, 2);
+    marshal(data: any, indent: number): string {
+        return JSON.stringify(data, null, indent);
     }
 }

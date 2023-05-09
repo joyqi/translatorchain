@@ -13,6 +13,7 @@ import { FormatterType, unmarshal, marshal, detectFormatterType } from './format
 import { TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
 import ora from 'ora';
 import languageEncoding from 'detect-file-encoding-and-language';
+import detectIndent from 'detect-indent';
 
 yargs(hideBin(process.argv))
     .command('tc [file]', 'Translate formated file', (yargs) => {
@@ -140,6 +141,8 @@ export async function translate<T extends StructureType, F extends FormatterType
 
     const srcText = readFileSync(srcFile, srcEnc);
     const dstText = existsSync(dstFile) ? readFileSync(dstFile, dstEnc) : '';
+    const srcIndent = Math.max(2, detectIndent(srcText).amount);
+    const dstIndent = existsSync(dstFile) ? Math.max(2, detectIndent(dstText).amount) : srcIndent;
     const src = unmarshal(format, srcText);
     const dst = unmarshal(format, dstText);
 
@@ -155,8 +158,8 @@ export async function translate<T extends StructureType, F extends FormatterType
         'Model': model,
         'Format': format,
         'Structure': type,
-        'Source File': srcFile + ` (${srcEnc})`,
-        'Destination File': dstFile + ` (${dstEnc})`,
+        'Source File': srcFile + ` (encoding:${srcEnc} indent:${srcIndent})`,
+        'Destination File': dstFile + ` (encoding:${dstEnc} indent:${dstIndent})`,
         'Source Language': srcLang,
         'Destination Language': dstLang,
         'Chunk Size': chunkSize,
@@ -182,5 +185,5 @@ export async function translate<T extends StructureType, F extends FormatterType
     const translatedPatch = join(type, translated);
     const translatedData = merge(type, keep, translatedPatch);
 
-    writeFileSync(dstFile, marshal(format, translatedData));
+    writeFileSync(dstFile, marshal(format, translatedData, dstIndent));
 }

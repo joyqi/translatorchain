@@ -10,6 +10,9 @@ dependencies:
   detect-file-encoding-and-language:
     specifier: ^2.3.3
     version: 2.3.3
+  detect-indent:
+    specifier: ^7.0.1
+    version: 7.0.1
   flat:
     specifier: ^5.0.2
     version: 5.0.2
@@ -535,6 +538,11 @@ packages:
   /detect-file-encoding-and-language@2.3.3:
     resolution: {integrity: sha512-gRw97Yu5wP2/jOIVCjBKlF0UlumI9p/UKj+AvFNEJIwvktdUvBf1yuRtljIUoUwEM/dy0vHtrsDlaEoxXflP3Q==}
     hasBin: true
+    dev: false
+
+  /detect-indent@7.0.1:
+    resolution: {integrity: sha512-Mc7QhQ8s+cLrnUfU/Ji94vG/r8M26m8f++vyres4ZoojaRDpZ1eSIh/EpzLNwlWuvzSZ3UbDFspjFvTDXe6e/g==}
+    engines: {node: '>=12.20'}
     dev: false
 
   /diff@4.0.2:
