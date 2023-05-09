@@ -12,6 +12,7 @@ import { StructureType, detectStructureType, diff, join, merge, split } from './
 import { FormatterType, unmarshal, marshal, detectFormatterType } from './formatter';
 import { TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
 import ora from 'ora';
+import languageEncoding from 'detect-file-encoding-and-language';
 
 yargs(hideBin(process.argv))
     .command('tc [file]', 'Translate formated file', (yargs) => {
@@ -40,9 +41,9 @@ function buildChain(chat: ChatOpenAI, systemMessage: string): LLMChain {
     });
 }
 
-// Detect the language name from user input
-async function detectLanguage(chat: ChatOpenAI, langText: string): Promise<string> {
-    if (langText.match(/^[A-Z][a-z]{2,}$/)) {
+// Rephrasing the language name from user input
+async function rephraseLanguage(chat: ChatOpenAI, langText: string): Promise<string> {
+    if (langText.match(/^[A-Z][a-z]{2,}(-[A-Z][a-z]{2,})?$/)) {
         return langText;
     } else if (langText === 'auto') {
         return 'any language';
@@ -60,8 +61,8 @@ async function detectLanguage(chat: ChatOpenAI, langText: string): Promise<strin
     return text;
 }
 
-// Detect the prompt text from user input
-async function detectPrompt(chat: ChatOpenAI, promptText: string | null): Promise<string> {
+// Rephrasing the prompt text from user input
+async function rephrasePrompt(chat: ChatOpenAI, promptText: string | null): Promise<string> {
     if (!promptText) {
         return '';
     }
@@ -77,6 +78,32 @@ async function detectPrompt(chat: ChatOpenAI, promptText: string | null): Promis
     spinner.succeed(`Detected ${text}`);
 
     return text;
+}
+
+async function detectFile(file: string): Promise<[BufferEncoding, string]> {
+    const {encoding, language} = await languageEncoding(file);
+    let enc: BufferEncoding = 'utf8';
+    let lang = 'auto';
+
+    switch (encoding) {
+        case 'latin1':
+            enc = 'latin1';
+            break;
+        case 'UTF-8':
+            enc = 'utf8';
+            break;
+        case 'UTF-16LE':
+            enc = 'utf16le';
+            break;
+        default:
+            throw new Error(`Unsupported encoding ${encoding}`);
+    }
+
+    if (language) {
+        lang = language.replace(/(^|\-)([a-z])/g, (...matches) => matches[2].toUpperCase());
+    }
+
+    return [enc, lang];
 }
 
 export async function translate<T extends StructureType, F extends FormatterType>(
@@ -104,12 +131,15 @@ export async function translate<T extends StructureType, F extends FormatterType
         format = detectFormatterType(srcFile);
     }
 
-    srcLang = await detectLanguage(chat, srcLang);
-    dstLang = await detectLanguage(chat, dstLang);
-    prompt = await detectPrompt(chat, prompt);
+    const [srcEnc, srcLangAuto] = await detectFile(srcFile);
+    const [dstEnc] = existsSync(dstFile) ? await detectFile(dstFile) : [srcEnc];
 
-    const srcText = readFileSync(srcFile, 'utf-8');
-    const dstText = existsSync(dstFile) ? readFileSync(dstFile, 'utf-8') : '';
+    srcLang = await rephraseLanguage(chat, srcLang === 'auto' ? srcLangAuto : srcLang);
+    dstLang = await rephraseLanguage(chat, dstLang);
+    prompt = await rephrasePrompt(chat, prompt);
+
+    const srcText = readFileSync(srcFile, srcEnc);
+    const dstText = existsSync(dstFile) ? readFileSync(dstFile, dstEnc) : '';
     const src = unmarshal(format, srcText);
     const dst = unmarshal(format, dstText);
 
@@ -125,8 +155,8 @@ export async function translate<T extends StructureType, F extends FormatterType
         'Model': model,
         'Format': format,
         'Structure': type,
-        'Source File': srcFile,
-        'Destination File': dstFile,
+        'Source File': srcFile + ` (${srcEnc})`,
+        'Destination File': dstFile + ` (${dstEnc})`,
         'Source Language': srcLang,
         'Destination Language': dstLang,
         'Chunk Size': chunkSize,

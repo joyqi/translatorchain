@@ -7,6 +7,9 @@ dependencies:
   deep-object-diff:
     specifier: ^1.1.9
     version: 1.1.9
+  detect-file-encoding-and-language:
+    specifier: ^2.3.3
+    version: 2.3.3
   flat:
     specifier: ^5.0.2
     version: 5.0.2
@@ -35,7 +38,7 @@ devDependencies:
     version: 10.0.1
   '@types/node':
     specifier: latest
-    version: 20.1.0
+    version: 20.1.1
   '@types/yargs':
     specifier: ^17.0.24
     version: 17.0.24
@@ -47,7 +50,7 @@ devDependencies:
     version: 10.2.0
   ts-node:
     specifier: latest
-    version: 10.9.1(@types/node@20.1.0)(typescript@5.0.4)
+    version: 10.9.1(@types/node@20.1.1)(typescript@5.0.4)
   tsc-esm-fix:
     specifier: latest
     version: 2.20.13(typescript@5.0.4)
@@ -172,8 +175,8 @@ packages:
     resolution: {integrity: sha512-/fvYntiO1GeICvqbQ3doGDIP97vWmvFt83GKguJ6prmQM2iXZfFcq6YE8KteFyRtX2/h5Hf91BYvPodJKFYv5Q==}
     dev: true
 
-  /@types/node@20.1.0:
-    resolution: {integrity: sha512-O+z53uwx64xY7D6roOi4+jApDGFg0qn6WHcxe5QeqjMaTezBO/mxdfFXIVAVVyNWKx84OmPB3L8kbVYOTeN34A==}
+  /@types/node@20.1.1:
+    resolution: {integrity: sha512-uKBEevTNb+l6/aCQaKVnUModfEMjAl98lw2Si9P5y4hLu9tm6AlX2ZIoXZX6Wh9lJueYPrGPKk5WMCNHg/u6/A==}
     dev: true
 
   /@types/normalize-package-data@2.4.1:
@@ -527,6 +530,11 @@ packages:
   /delayed-stream@1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
     engines: {node: '>=0.4.0'}
+    dev: false
+
+  /detect-file-encoding-and-language@2.3.3:
+    resolution: {integrity: sha512-gRw97Yu5wP2/jOIVCjBKlF0UlumI9p/UKj+AvFNEJIwvktdUvBf1yuRtljIUoUwEM/dy0vHtrsDlaEoxXflP3Q==}
+    hasBin: true
     dev: false
 
   /diff@4.0.2:
@@ -1650,7 +1658,7 @@ packages:
     engines: {node: '>=14.16'}
     dev: true
 
-  /ts-node@10.9.1(@types/node@20.1.0)(typescript@5.0.4):
+  /ts-node@10.9.1(@types/node@20.1.1)(typescript@5.0.4):
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
     hasBin: true
     peerDependencies:
@@ -1669,7 +1677,7 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.3
-      '@types/node': 20.1.0
+      '@types/node': 20.1.1
       acorn: 8.8.2
       acorn-walk: 8.2.0
       arg: 4.1.3
