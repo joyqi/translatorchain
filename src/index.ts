@@ -8,8 +8,8 @@ import {
 } from 'langchain/prompts';
 import { LLMChain } from 'langchain/chains';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { StructureType, detectStructureType, diff, join, merge, split } from './structure';
-import { FormatterType, unmarshal, marshal, detectFormatterType } from './formatter';
+import { StructureType, detectStructureType, getStructure } from './structure';
+import { FormatterType, detectFormatterType, getFormatter } from './formatter';
 import { TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
 import ora from 'ora';
 import languageEncoding from 'detect-file-encoding-and-language';
@@ -143,15 +143,17 @@ export async function translate<T extends StructureType, F extends FormatterType
     const dstText = existsSync(dstFile) ? readFileSync(dstFile, dstEnc) : '';
     const srcIndent = Math.max(2, detectIndent(srcText).amount);
     const dstIndent = existsSync(dstFile) ? Math.max(2, detectIndent(dstText).amount) : srcIndent;
-    const src = unmarshal(format, srcText);
-    const dst = unmarshal(format, dstText);
+    const fmt = getFormatter(format);
+    const src = fmt.unmarshal(srcText);
+    const dst = fmt.unmarshal(dstText);
 
     if (type === 'auto') {
         type = detectStructureType(src);
     }
 
-    const [keep, patch] = diff(type, src, dst);
-    const chunks = split(type, patch, enc, chunkSize);
+    const structure = getStructure(type);
+    const [keep, patch] = structure.diff(src, dst);
+    const chunks = structure.split(patch, enc, chunkSize);
     const translated = [];
 
     console.table({
@@ -182,8 +184,8 @@ export async function translate<T extends StructureType, F extends FormatterType
     }
 
     spinner.succeed(`Translated ${chunks.length} chunks`);
-    const translatedPatch = join(type, translated);
-    const translatedData = merge(type, keep, translatedPatch);
+    const translatedPatch = structure.join(translated);
+    const translatedData = structure.merge(keep, translatedPatch);
 
-    writeFileSync(dstFile, marshal(format, translatedData, dstIndent));
+    writeFileSync(dstFile, fmt.marshal(translatedData, dstIndent));
 }

@@ -15,7 +15,7 @@ export interface Formatter {
     marshal: (data: any, indent: number) => string;
 }
 
-function getFormatter<T extends FormatterType>(type: T['type']): T['formatter'] {
+export function getFormatter<T extends FormatterType>(type: T['type']): T['formatter'] {
     switch (type) {
         case 'json':
             return new json();
@@ -38,19 +38,4 @@ export function detectFormatterType(fileName: string): FormatterType['type'] {
         default:
             throw new Error(`Unknown file extension: ${ext}`);
     }
-}
-
-export function unmarshal<T extends FormatterType>(
-    type: T['type'],
-    text: Parameters<T['formatter']['unmarshal']>[0]
-) {
-    return getFormatter(type).unmarshal(text);
-}
-
-export function marshal<T extends FormatterType>(
-    type: T['type'],
-    data: Parameters<T['formatter']['marshal']>[0],
-    indent: Parameters<T['formatter']['marshal']>[1]
-) {
-    return getFormatter(type).marshal(data, indent);
 }

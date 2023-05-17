@@ -1,4 +1,4 @@
-import { Tiktoken, TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
+import { Tiktoken } from '@dqbd/tiktoken';
 import KV from './kv';
 import Tree from './tree';
 
@@ -22,7 +22,7 @@ export interface Structure<T extends any> {
     merge: (src: T, patch: T) => T;
 }
 
-function getSpliter<T extends StructureType>(type: T['type']): T['structure'] {
+export function getStructure<T extends StructureType>(type: T['type']): T['structure'] {
     switch (type) {
         case 'kv':
             return new KV();
@@ -49,36 +49,4 @@ export function detectStructureType(data: any): StructureType['type'] {
 
 export function jsonTokenLength(text: string, enc: Tiktoken): number {
     return enc.encode(JSON.stringify(text)).length;
-}
-
-export function split<T extends StructureType>(
-    type: T['type'],
-    data: Parameters<T['structure']['split']>[0],
-    enc: Parameters<T['structure']['split']>[1],
-    chunkSize: Parameters<T['structure']['split']>[2]
-) {
-    return getSpliter(type).split(data, enc, chunkSize);
-}
-
-export function join<T extends StructureType>(
-    type: T['type'],
-    chunks: Parameters<T['structure']['join']>[0]
-) {
-    return getSpliter(type).join(chunks);
-}
-
-export function diff<T extends StructureType>(
-    type: T['type'],
-    src: Parameters<T['structure']['diff']>[0],
-    dst: Parameters<T['structure']['diff']>[1]
-) {
-    return getSpliter(type).diff(src, dst);
-}
-
-export function merge<T extends StructureType>(
-    type: T['type'],
-    src: Parameters<T['structure']['merge']>[0],
-    patch: Parameters<T['structure']['merge']>[1]
-) {
-    return getSpliter(type).merge(src, patch);
 }
