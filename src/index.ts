@@ -8,7 +8,7 @@ import { LLMChain } from 'langchain/chains';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { StructureType, detectStructureType, getStructure } from './structure';
 import { FormatterType, detectFormatterType, getFormatter } from './formatter';
-import { TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
+import { Tiktoken, TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
 import ora from 'ora';
 import languageEncoding from 'detect-file-encoding-and-language';
 import detectIndent from 'detect-indent';
@@ -91,11 +91,23 @@ async function detectFile(file: string): Promise<[BufferEncoding, string]> {
     return [enc, lang];
 }
 
+function getEncModel(modelName: string): Tiktoken {
+    if (modelName.match(/^gpt\-3\.5\-turbo\-[0-9]{4}$/)) {
+        modelName = 'gpt-3.5-turbo-0301';
+    } else if (modelName.match(/^gpt\-3\.5\-turbo\-16k(\-[0-9]{4})?$/)) {
+        modelName = 'gpt-3.5-turbo';
+    } else if (modelName.match(/^gpt\-4(\-[0-9]{4})?$/)) {
+        modelName = 'gpt-4';
+    }
+
+    return encoding_for_model(modelName as TiktokenModel);
+}
+
 export async function translate<T extends StructureType, F extends FormatterType>(
     type: T['type'] | 'auto',
     format: F['type'] | 'auto',
     openAIApiKey: string,
-    model: TiktokenModel,
+    model: string,
     prompt: string | null,
     srcFile: string,
     dstFile: string,
@@ -110,7 +122,7 @@ export async function translate<T extends StructureType, F extends FormatterType
     });
 
     const chain = buildChain(chat, 'You are a helpful assistant that translates json formatted data from {input_language} to {output_language}. {prompt}');
-    const enc = encoding_for_model(model);
+    const enc = getEncModel(model);
 
     if (format === 'auto') {
         format = detectFormatterType(srcFile);

@@ -85,7 +85,7 @@ const argv = yargs(hideBin(process.argv))
         type as any,
         format as any,
         key,
-        model as any,
+        model,
         prompt,
         _[0] as string,
         output,
