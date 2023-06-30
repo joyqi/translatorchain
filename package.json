@@ -40,6 +40,7 @@
   "devDependencies": {
     "@types/flat": "^5.0.2",
     "@types/js-yaml": "^4.0.5",
+    "@types/marked": "^5.0.0",
     "@types/mocha": "latest",
     "@types/node": "latest",
     "@types/yargs": "^17.0.24",
@@ -57,6 +58,7 @@
     "flat": "^5.0.2",
     "js-yaml": "^4.1.0",
     "langchain": "^0.0.70",
+    "marked": "^5.1.0",
     "ora": "^5.0.0",
     "yargs": "^17.7.2"
   }

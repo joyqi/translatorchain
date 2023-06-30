@@ -22,6 +22,9 @@ dependencies:
   langchain:
     specifier: ^0.0.70
     version: 0.0.70
+  marked:
+    specifier: ^5.1.0
+    version: 5.1.0
   ora:
     specifier: ^5.0.0
     version: 5.4.1
@@ -36,12 +39,15 @@ devDependencies:
   '@types/js-yaml':
     specifier: ^4.0.5
     version: 4.0.5
+  '@types/marked':
+    specifier: ^5.0.0
+    version: 5.0.0
   '@types/mocha':
     specifier: latest
     version: 10.0.1
   '@types/node':
     specifier: latest
-    version: 20.1.1
+    version: 20.3.2
   '@types/yargs':
     specifier: ^17.0.24
     version: 17.0.24
@@ -53,13 +59,13 @@ devDependencies:
     version: 10.2.0
   ts-node:
     specifier: latest
-    version: 10.9.1(@types/node@20.1.1)(typescript@5.0.4)
+    version: 10.9.1(@types/node@20.3.2)(typescript@5.1.6)
   tsc-esm-fix:
     specifier: latest
-    version: 2.20.13(typescript@5.0.4)
+    version: 2.20.14(typescript@5.1.6)
   typescript:
     specifier: latest
-    version: 5.0.4
+    version: 5.1.6
 
 packages:
 
@@ -170,6 +176,10 @@ packages:
     resolution: {integrity: sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==}
     dev: true
 
+  /@types/marked@5.0.0:
+    resolution: {integrity: sha512-YcZe50jhltsCq7rc9MNZC/4QB/OnA2Pd6hrOSTOFajtabN+38slqgDDCeE/0F83SjkKBQcsZUj7VLWR0H5cKRA==}
+    dev: true
+
   /@types/minimist@1.2.2:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
     dev: true
@@ -178,8 +188,8 @@ packages:
     resolution: {integrity: sha512-/fvYntiO1GeICvqbQ3doGDIP97vWmvFt83GKguJ6prmQM2iXZfFcq6YE8KteFyRtX2/h5Hf91BYvPodJKFYv5Q==}
     dev: true
 
-  /@types/node@20.1.1:
-    resolution: {integrity: sha512-uKBEevTNb+l6/aCQaKVnUModfEMjAl98lw2Si9P5y4hLu9tm6AlX2ZIoXZX6Wh9lJueYPrGPKk5WMCNHg/u6/A==}
+  /@types/node@20.3.2:
+    resolution: {integrity: sha512-vOBLVQeCQfIcF/2Y7eKFTqrMnizK5lRNQ7ykML/5RuwVXVWxYkgwS7xbt4B6fKCUPgbSL5FSsjHQpaGQP/dQmw==}
     dev: true
 
   /@types/normalize-package-data@2.4.1:
@@ -490,14 +500,14 @@ packages:
       supports-color: 8.1.1
     dev: true
 
-  /decamelize-keys@2.0.1(typescript@5.0.4):
+  /decamelize-keys@2.0.1(typescript@5.1.6):
     resolution: {integrity: sha512-nrNeSCtU2gV3Apcmn/EZ+aR20zKDuNDStV67jPiupokD3sOAFeMzslLMCFdKv1sPqzwoe5ZUhsSW9IAVgKSL/Q==}
     engines: {node: '>=14.16'}
     dependencies:
       decamelize: 6.0.0
       map-obj: 4.3.0
       quick-lru: 6.1.1
-      type-fest: 3.10.0(typescript@5.0.4)
+      type-fest: 3.10.0(typescript@5.1.6)
     transitivePeerDependencies:
       - typescript
     dev: true
@@ -1126,21 +1136,27 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /meow@12.0.1(typescript@5.0.4):
+  /marked@5.1.0:
+    resolution: {integrity: sha512-z3/nBe7aTI8JDszlYLk7dDVNpngjw0o1ZJtrA9kIfkkHcIF+xH7mO23aISl4WxP83elU+MFROgahqdpd05lMEQ==}
+    engines: {node: '>= 18'}
+    hasBin: true
+    dev: false
+
+  /meow@12.0.1(typescript@5.1.6):
     resolution: {integrity: sha512-/QOqMALNoKQcJAOOdIXjNLtfcCdLXbMFyB1fOOPdm6RzfBTlsuodOCTBDjVbeUSmgDQb8UI2oONqYGtq1PKKKA==}
     engines: {node: '>=16.10'}
     dependencies:
       '@types/minimist': 1.2.2
       camelcase-keys: 8.0.2
       decamelize: 6.0.0
-      decamelize-keys: 2.0.1(typescript@5.0.4)
+      decamelize-keys: 2.0.1(typescript@5.1.6)
       hard-rejection: 2.1.0
       minimist-options: 4.1.0
       normalize-package-data: 5.0.0
       read-pkg-up: 9.1.0
       redent: 4.0.0
       trim-newlines: 5.0.0
-      type-fest: 3.10.0(typescript@5.0.4)
+      type-fest: 3.10.0(typescript@5.1.6)
       yargs-parser: 21.1.1
     transitivePeerDependencies:
       - typescript
@@ -1666,7 +1682,7 @@ packages:
     engines: {node: '>=14.16'}
     dev: true
 
-  /ts-node@10.9.1(@types/node@20.1.1)(typescript@5.0.4):
+  /ts-node@10.9.1(@types/node@20.3.2)(typescript@5.1.6):
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
     hasBin: true
     peerDependencies:
@@ -1685,27 +1701,27 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.3
-      '@types/node': 20.1.1
+      '@types/node': 20.3.2
       acorn: 8.8.2
       acorn-walk: 8.2.0
       arg: 4.1.3
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
-      typescript: 5.0.4
+      typescript: 5.1.6
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
     dev: true
 
-  /tsc-esm-fix@2.20.13(typescript@5.0.4):
-    resolution: {integrity: sha512-XZFfnljOA2h2wnyxz9oD1I38xHa28EoxjqnvY8kc8uTOIuQPu/t3e/lKTBHW5cakKer2w2P4U3zHNjkzC8Lblw==}
+  /tsc-esm-fix@2.20.14(typescript@5.1.6):
+    resolution: {integrity: sha512-s4hA4FD5ux4OvUDywLGl7jMBuK0kEZTqmLPNVy82OR/q18N5nN8C8NKPyAdw/XKtrm8vG+aqcNkJMXa1wPk8qQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     hasBin: true
     dependencies:
       fs-extra: 11.1.1
       globby: 13.1.4
       json5: 2.2.3
-      meow: 12.0.1(typescript@5.0.4)
+      meow: 12.0.1(typescript@5.1.6)
       tslib: 2.5.0
     transitivePeerDependencies:
       - typescript
@@ -1720,18 +1736,18 @@ packages:
     engines: {node: '>=12.20'}
     dev: true
 
-  /type-fest@3.10.0(typescript@5.0.4):
+  /type-fest@3.10.0(typescript@5.1.6):
     resolution: {integrity: sha512-hmAPf1datm+gt3c2mvu0sJyhFy6lTkIGf0GzyaZWxRLnabQfPUqg6tF95RPg6sLxKI7nFLGdFxBcf2/7+GXI+A==}
     engines: {node: '>=14.16'}
     peerDependencies:
       typescript: '>=4.7.0'
     dependencies:
-      typescript: 5.0.4
+      typescript: 5.1.6
     dev: true
 
-  /typescript@5.0.4:
-    resolution: {integrity: sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==}
-    engines: {node: '>=12.20'}
+  /typescript@5.1.6:
+    resolution: {integrity: sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==}
+    engines: {node: '>=14.17'}
     hasBin: true
     dev: true
 

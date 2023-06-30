@@ -1,6 +1,7 @@
 import { extname } from 'path';
 import json from './json';
 import yaml from './yaml';
+import markdown from './markdown';
 
 export type FormatterType = {
     type: 'json',
@@ -8,6 +9,9 @@ export type FormatterType = {
 } | {
     type: 'yaml',
     formatter: yaml
+} | {
+    type: 'markdown',
+    formatter: markdown
 };
 
 export interface Formatter {
@@ -21,6 +25,8 @@ export function getFormatter<T extends FormatterType>(type: T['type']): T['forma
             return new json();
         case 'yaml':
             return new yaml();
+        case 'markdown':
+            return new markdown();
         default:
             throw new Error(`Unknown formatter type: ${type}`);
     }
@@ -35,6 +41,8 @@ export function detectFormatterType(fileName: string): FormatterType['type'] {
         case '.yaml':
         case '.yml':
             return 'yaml';
+        case '.md':
+            return 'markdown';
         default:
             throw new Error(`Unknown file extension: ${ext}`);
     }

@@ -1,5 +1,3 @@
-import yargs from 'yargs';
-import { hideBin } from 'yargs/helpers';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import {
     ChatPromptTemplate,
@@ -14,20 +12,6 @@ import { TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
 import ora from 'ora';
 import languageEncoding from 'detect-file-encoding-and-language';
 import detectIndent from 'detect-indent';
-
-yargs(hideBin(process.argv))
-    .command('tc [file]', 'Translate formated file', (yargs) => {
-        return yargs.positional('file', {
-            describe: 'File to translate',
-            type: 'string',
-            default: 'lang.json',
-        });
-    })
-    .option('key', {
-        alias: 'k',
-        type: 'string',
-        description: 'OpenAI API key',
-    }).parse();
 
 // Build the chat model
 function buildChain(chat: ChatOpenAI, systemMessage: string): LLMChain {

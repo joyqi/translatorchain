@@ -95,3 +95,4 @@ Sample input file(json format):
 * `auto`: Automatically detect the file format.
 * `json`: JSON format.
 * `yaml`: YAML format.
+* `markdown`: Markdown format.
