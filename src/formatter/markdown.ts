@@ -10,6 +10,8 @@ type Links = {
 export default class implements Formatter {
     private links: Links = {};
 
+    private codes: Record<string, string> = {};
+
     unmarshal(text: string): any {
         const tokens = marked.lexer(text);
         const result: Record<string, string> = {};
@@ -19,7 +21,13 @@ export default class implements Formatter {
         }
 
         for (const [i, token] of tokens.entries()) {
-            result[PREFIX + i] = token.raw;
+            const isCode = token.type === 'code';
+            const key = PREFIX + i;
+            result[key] = isCode ? '' : token.raw;
+            
+            if (isCode) {
+                this.codes[key] = token.raw;
+            }
         }
 
         return result;
@@ -33,6 +41,10 @@ export default class implements Formatter {
                 const suffix = link.title ? ` "${link.title}"` : '';
                 links += `[${key}]: ${link.href}${suffix}\n`;
             }
+        }
+
+        for (const [key, code] of Object.entries(this.codes)) {
+            data[key] = code;
         }
 
         return Object.values(data).join('') + links;
