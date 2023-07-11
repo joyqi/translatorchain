@@ -9,7 +9,7 @@ export default class implements Structure<TreeStructure> {
     private kv = new kv();
 
     split(data: TreeStructure, enc: Tiktoken, chunkSize: number): TreeStructure[] {
-        return this.kv.split(flatten(data), enc, chunkSize);
+        return this.kv.split(data, enc, chunkSize);
     }
 
     join(chunks: TreeStructure[]): TreeStructure {
@@ -17,7 +17,7 @@ export default class implements Structure<TreeStructure> {
     }
 
     diff(src: TreeStructure, dst: TreeStructure | null): [TreeStructure, TreeStructure] {
-        return this.kv.diff(src, dst);
+        return this.kv.diff(flatten(src), flatten(dst || {}));
     }
 
     merge(src: TreeStructure, patch: TreeStructure): TreeStructure {

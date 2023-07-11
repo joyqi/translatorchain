@@ -5,6 +5,8 @@ import { addedDiff, deletedDiff } from 'deep-object-diff';
 type KVStructure = Record<string, string>;
 
 export default class implements Structure<KVStructure> {
+    private keys: string[] = [];
+
     split(data: KVStructure, enc: Tiktoken, chunkSize: number): KVStructure[] {
         let left: KVStructure = {};
         const result: KVStructure[] = [];
@@ -48,13 +50,8 @@ export default class implements Structure<KVStructure> {
             dst = {};
         }
 
-        const patch: KVStructure = {};
-        const addedDiffs = addedDiff(dst, src) as KVStructure;
-
-        for (const [key, value] of Object.entries(addedDiffs)) {
-            patch[key] = value;
-        }
-
+        this.keys = Object.keys(src);
+        const patch = addedDiff(dst, src) as KVStructure;
         const deletedDiffs = deletedDiff(dst, src) as KVStructure;
 
         for (const key of Object.keys(deletedDiffs)) {
@@ -65,7 +62,13 @@ export default class implements Structure<KVStructure> {
     }
 
     merge(src: KVStructure, patch: KVStructure): KVStructure {
+        const result: KVStructure = {};
         Object.assign(src, patch);
-        return src;
+
+        for (const key of this.keys) {
+            result[key] = src[key];
+        }
+
+        return result;
     }
 }
