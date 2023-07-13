@@ -3,6 +3,8 @@ import { Structure } from '.';
 import kv from "./kv";
 import { flatten, unflatten } from "flat";
 
+const delimiter = '|';
+
 type TreeStructure = Record<string, any>;
 
 export default class implements Structure<TreeStructure> {
@@ -17,10 +19,10 @@ export default class implements Structure<TreeStructure> {
     }
 
     diff(src: TreeStructure, dst: TreeStructure | null): [TreeStructure, TreeStructure] {
-        return this.kv.diff(flatten(src), flatten(dst || {}));
+        return this.kv.diff(flatten(src, { delimiter }), flatten(dst || {}, { delimiter }));
     }
 
     merge(src: TreeStructure, patch: TreeStructure): TreeStructure {
-        return unflatten(this.kv.merge(src, patch));
+        return unflatten(this.kv.merge(src, patch), { delimiter });
     }
 }
