@@ -17,7 +17,9 @@ export default class implements Formatter {
         const result: Record<string, string> = {};
 
         if (tokens.links) {
-            this.links = tokens.links;
+            for (const [key, link] of Object.entries(tokens.links)) {
+                this.links[key] = { href: link.href, title: link.title };
+            }
         }
 
         for (const [i, token] of tokens.entries()) {
