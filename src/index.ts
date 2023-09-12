@@ -5,13 +5,14 @@ import {
     SystemMessagePromptTemplate,
 } from 'langchain/prompts';
 import { LLMChain } from 'langchain/chains';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { StructureType, detectStructureType, getStructure } from './structure';
 import { FormatterType, detectFormatterType, getFormatter } from './formatter';
 import { Tiktoken, TiktokenModel, encoding_for_model } from '@dqbd/tiktoken';
 import ora from 'ora';
 import languageEncoding from 'detect-file-encoding-and-language';
 import detectIndent from 'detect-indent';
+import { dirname } from 'path';
 
 // Build the chat model
 function buildChain(chat: ChatOpenAI, systemMessage: string): LLMChain {
@@ -103,6 +104,16 @@ function getEncModel(modelName: string): Tiktoken {
     return encoding_for_model(modelName as TiktokenModel);
 }
 
+function writeTo(path: string, data: string) {
+    const dir = dirname(path);
+
+    if (!existsSync(dir)) {
+        mkdirSync(dir, { recursive: true });
+    }
+
+    writeFileSync(path, data);
+}
+
 export async function translate<T extends StructureType, F extends FormatterType>(
     type: T['type'] | 'auto',
     format: F['type'] | 'auto',
@@ -183,5 +194,5 @@ export async function translate<T extends StructureType, F extends FormatterType
     const translatedPatch = structure.join(translated);
     const translatedData = structure.merge(keep, translatedPatch);
 
-    writeFileSync(dstFile, fmt.marshal(translatedData, dstIndent));
+    writeTo(dstFile, fmt.marshal(translatedData, dstIndent));
 }
