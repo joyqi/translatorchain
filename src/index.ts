@@ -95,7 +95,7 @@ async function detectFile(file: string): Promise<[BufferEncoding, string]> {
 function getEncModel(modelName: string): Tiktoken {
     if (modelName.match(/^gpt\-3\.5\-turbo\-[0-9]{4}$/)) {
         modelName = 'gpt-3.5-turbo-0301';
-    } else if (modelName.match(/^gpt\-3\.5\-turbo\-16k(\-[0-9]{4})?$/)) {
+    } else if (modelName.match(/^gpt\-3\.5\-turbo\-[0-9a-z]{2,}(\-[0-9]{4})?$/)) {
         modelName = 'gpt-3.5-turbo';
     } else if (modelName.match(/^gpt\-4(\-[0-9]{4})?$/)) {
         modelName = 'gpt-4';
