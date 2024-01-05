@@ -29,7 +29,7 @@ const argv = yargs(hideBin(process.argv))
         alias: 'f',
         type: 'string',
         description: 'The type of the file formatter',
-        choices: ['auto', 'json', 'yaml', 'markdown'],
+        choices: ['auto', 'json', 'yaml', 'markdown', 'srt'],
         demandOption: true,
         default: 'auto'
     })

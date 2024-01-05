@@ -142,10 +142,6 @@ export async function translate<T extends StructureType, F extends FormatterType
     const [srcEnc, srcLangAuto] = await detectFile(srcFile);
     const [dstEnc] = existsSync(dstFile) ? await detectFile(dstFile) : [srcEnc];
 
-    srcLang = await rephraseLanguage(chat, srcLang === 'auto' ? srcLangAuto : srcLang);
-    dstLang = await rephraseLanguage(chat, dstLang);
-    prompt = await rephrasePrompt(chat, prompt);
-
     const srcText = readFileSync(srcFile, srcEnc);
     const dstText = existsSync(dstFile) ? readFileSync(dstFile, dstEnc) : '';
     const srcIndent = Math.max(2, detectIndent(srcText).amount);
@@ -163,34 +159,41 @@ export async function translate<T extends StructureType, F extends FormatterType
     const chunks = structure.split(patch, enc, chunkSize);
     const translated = [];
 
-    console.table({
-        'Model': model,
-        'Format': format,
-        'Structure': type,
-        'Source File': srcFile + ` (encoding:${srcEnc} indent:${srcIndent})`,
-        'Destination File': dstFile + ` (encoding:${dstEnc} indent:${dstIndent})`,
-        'Source Language': srcLang,
-        'Destination Language': dstLang,
-        'Chunk Size': chunkSize,
-        'Chunks': chunks.length,
-    });
+    if (chunks.length > 0) {
+        srcLang = await rephraseLanguage(chat, srcLang === 'auto' ? srcLangAuto : srcLang);
+        dstLang = await rephraseLanguage(chat, dstLang);
+        prompt = await rephrasePrompt(chat, prompt);
 
-    const spinner = ora('Start translating').start();
-
-    for (const chunk of chunks) {
-        spinner.text = `Translating ${translated.length + 1}/${chunks.length} chunks`;
-
-        const { text } = await chain.call({
-            input_language: srcLang,
-            output_language: dstLang,
-            prompt,
-            text: JSON.stringify(chunk)
+        console.table({
+            'Model': model,
+            'Format': format,
+            'Structure': type,
+            'Source File': srcFile + ` (encoding:${srcEnc} indent:${srcIndent})`,
+            'Destination File': dstFile + ` (encoding:${dstEnc} indent:${dstIndent})`,
+            'Source Language': srcLang,
+            'Destination Language': dstLang,
+            'Chunk Size': chunkSize,
+            'Chunks': chunks.length,
         });
 
-        translated.push(JSON.parse(text));
+        const spinner = ora('Start translating').start();
+
+        for (const chunk of chunks) {
+            spinner.text = `Translating ${translated.length + 1}/${chunks.length} chunks`;
+
+            const { text } = await chain.call({
+                input_language: srcLang,
+                output_language: dstLang,
+                prompt,
+                text: JSON.stringify(chunk)
+            });
+
+            translated.push(JSON.parse(text));
+        }
+
+        spinner.succeed(`Translated ${chunks.length} chunks`);
     }
 
-    spinner.succeed(`Translated ${chunks.length} chunks`);
     const translatedPatch = structure.join(translated);
     const translatedData = structure.merge(keep, translatedPatch);
 
