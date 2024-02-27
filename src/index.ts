@@ -50,18 +50,18 @@ async function rephraseLanguage(chat: ChatOpenAI, langText: string): Promise<str
 // Rephrasing the prompt text from user input
 async function rephrasePrompt(chat: ChatOpenAI, promptText: string | null): Promise<string> {
     if (!promptText) {
-        return '';
+        return 'Keep the original intent and meaning of the text.';
     }
 
-    const chain = buildChain(chat, 'You are a helpful assistant that writes the summarize of the text, rephrasing it in English as the second half of the following sentence: {input}.');
-    const spinner = ora(`Detecting ${promptText}`).start();
+    const chain = buildChain(chat, `You are a translation rule rephraser, please rephrase the following text to make it more suitable for translation.`);
+    const spinner = ora('Rephrasing rules...').start();
 
     const { text } = await chain.call({
-        input: 'This input data is about',
         text: promptText
     });
 
-    spinner.succeed(`Detected ${text}`);
+    spinner.succeed('Rules rephrased');
+    console.log(text);
 
     return text;
 }
@@ -93,14 +93,6 @@ async function detectFile(file: string): Promise<[BufferEncoding, string]> {
 }
 
 function getEncModel(modelName: string): Tiktoken {
-    if (modelName.match(/^gpt\-3\.5\-turbo\-[0-9]{4}$/)) {
-        modelName = 'gpt-3.5-turbo-0301';
-    } else if (modelName.match(/^gpt\-3\.5\-turbo\-[0-9a-z]{2,}(\-[0-9]{4})?$/)) {
-        modelName = 'gpt-3.5-turbo';
-    } else if (modelName.match(/^gpt\-4(\-[0-9]{4})?$/)) {
-        modelName = 'gpt-4';
-    }
-
     return encoding_for_model(modelName as TiktokenModel);
 }
 
@@ -133,7 +125,11 @@ export async function translate<T extends StructureType, F extends FormatterType
     });
 
     const chain = buildChain(chat, `You a data translate api that translates json formatted data from {input_language} to {output_language}.
-    {prompt} Please respond with your translation directly in JSON format.`);
+
+    Follow the following rules:
+    {prompt}
+
+    Please respond with your translation directly in JSON format.`);
     const enc = getEncModel(model);
 
     if (format === 'auto') {
