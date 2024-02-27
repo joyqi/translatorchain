@@ -132,7 +132,8 @@ export async function translate<T extends StructureType, F extends FormatterType
         modelName: model,
     });
 
-    const chain = buildChain(chat, 'You are a helpful assistant that translates json formatted data from {input_language} to {output_language}. {prompt}');
+    const chain = buildChain(chat, `You a data translate api that translates json formatted data from {input_language} to {output_language}.
+    {prompt} Please respond with your translation directly in JSON format.`);
     const enc = getEncModel(model);
 
     if (format === 'auto') {
