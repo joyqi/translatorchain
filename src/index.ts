@@ -106,6 +106,16 @@ function writeTo(path: string, data: string) {
     writeFileSync(path, data);
 }
 
+function extractJSON(text: string): string {
+    const match = text.match(/\s*```json\n([\s\S]+?)\n```\s*/);
+
+    if (match) {
+        return match[1];
+    }
+
+    return text;
+}
+
 export async function translate<T extends StructureType, F extends FormatterType>(
     type: T['type'] | 'auto',
     format: F['type'] | 'auto',
@@ -185,7 +195,7 @@ export async function translate<T extends StructureType, F extends FormatterType
                 text: JSON.stringify(chunk)
             });
 
-            translated.push(JSON.parse(text));
+            translated.push(JSON.parse(extractJSON(text)));
         }
 
         spinner.succeed(`Translated ${chunks.length} chunks`);
